@@ -21,18 +21,6 @@ func _init(grid_size: int):
 			squares[i].append(0.)
 			velocities[i].append(Vector2(0, 0))
 	
-	#for j in range(grid_size):
-		#for i in range(25, 27):
-			#velocities[i][j] = Vector2(30., 0.)
-		#for i in range(23, 24):
-			#velocities[i][j] = Vector2(20., 0.)
-		#for i in range(27, 28):
-			#velocities[i][j] = Vector2(20., 0.)
-		#for i in range(20, 22):
-			#velocities[i][j] = Vector2(5., 0.)
-		#for i in range(28, 30):
-			#velocities[i][j] = Vector2(5., 0.)
-	
 func add_density(i: int, j: int, delta: float):
 	squares[i][j] += max(delta * DENSITY, 1.)
 	
