@@ -6,7 +6,7 @@ A small interactive fluid simulation, made with the [Godot Engine](https://godot
 
 You can create new fluid by holding the left mouse button, and move it around by holding the right mouse button and dragging it around
 
-![Creating and moving fluid](https://giphy.com/gifs/4oQKdrIbijxkAgAZIQ)
+![Creating and moving fluid](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjRndG1uaXIxNjducms3NTN6bGlybGRtemx2NThpY2pmOTMxdWpzbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4oQKdrIbijxkAgAZIQ/giphy.gif)
 
 ## Physics stuff
 
