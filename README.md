@@ -26,10 +26,10 @@ $$
 \end{aligned}
 $$
 
-The first one is for mass conservation, that we can express a lack of divergence of the velocity vector field.
-The second equation express acceleration as dependent from 3 factors: internal forces (pressure and viscosity) and external forces. We will translate this concepts by calculating the evolution of the density of the fluid.
+The first one represents mass conservation, that we can express a lack of divergence of the velocity vector field.
+The second equation tells us that the acceleration is dependent on 3 factors: internal forces (pressure and viscosity) and external forces. We will translate this concepts by calculating the evolution of the density of the fluid.
 
-The fluid's density is represented as the opacity of squares on a grid, and its evolution only depends another parameter: velocity.
+The fluid's density is represented as the opacity of squares on a grid, and its evolution only depends on another parameter: velocity.
 
 ### Diffusion
 
@@ -110,7 +110,7 @@ We can now subtract this value to every cell of the grid to remove the divergenc
 
 ### Vorticity confinment
 
-To create a more realistic effect of secondary swirls it's useful to manually accelerate the velocity in zones with existing curl, due to the failure of numerical discretisation methods to introduce small-scal features of the flow.
+To create a more realistic effect of secondary swirls it's useful to manually accelerate the velocity in zones with existing curl, due to the failure of numerical discretisation methods to introduce small-scale features of the flow.
 
 The operation is pretty simple, for every cell we get the curl:
 
