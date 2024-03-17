@@ -12,6 +12,8 @@ var length: int
 const DENSITY = 50.
 const DIFFUSION_RATE = .03
 
+const vorticity = 3.
+
 # Iterations of Gauss-Seidel method
 const diffuse_density_iterations = 5
 const diffuse_velocity_iterations = 12
@@ -162,16 +164,19 @@ func get_line(i1, j1, i2, j2):
 
 	return points
 	
+func curl(i: int, j: int):
+	return (
+		velocities[((i+1) * size) + j].x -
+		velocities[(i-1) * size  + j].x +
+		velocities[(i * size) + j+1].y -
+		velocities[i*size + j-1].y
+	)
+
 func clear_divergence():
 	for i in range(1, size - 1):
 		for j in range(1, size - 1):
 			p[(i * size) + j] = 0.
-			divergence[(i * size) + j] = -(
-				velocities[((i+1) * size) + j].x -
-				velocities[(i-1) * size  + j].x +
-				velocities[(i * size) + j+1].y -
-				velocities[i*size + j-1].y
-			)/(2 * size)
+			divergence[(i * size) + j] = -curl(i, j)/(2 * size)
 	for z in range(divergence_iterations):
 		for i in range(1, size - 1):
 			for j in range(1, size - 1):
@@ -191,6 +196,19 @@ func clear_divergence():
 	
 	set_bounds_v()
 	
+func vorticity_confinment(delta: float):
+	for i in range(2, size - 2):
+		for j in range(2, size - 2):
+			var dx = abs(curl(i, j-1)) - abs(curl(i, j+1))
+			var dy = abs(curl(i+1, j)) - abs(curl(i-1, j))
+			var length = sqrt(dx*dx + dy*dy) + 1e-5
+			var vx = vorticity/length*dx
+			var vy = vorticity/length*dy
+			
+			var curl_ij = curl(i,j)
+			
+			velocities[i*size + j] += Vector2(delta*curl_ij*vx, delta*curl_ij*vy)
+
 
 func set_bounds():
 	
@@ -232,7 +250,17 @@ func set_bounds_v():
 		)
 		
 	velocities[0] = (velocities[size] + velocities[1])/2
-	velocities[size - 1] = (velocities[size + size - 1] + velocities[size - 2])/2
-	velocities[(size - 1)* size] = (velocities[(size - 2)*size] + velocities[(size - 1)*size + 1])/2
-	velocities[(size - 1)*size + size - 1] = (velocities[(size - 2)*size + size - 1] + velocities[(size - 1)*size + size - 2])/2
+	velocities[size - 1] = (
+		velocities[size + size - 1] +
+		velocities[size - 2]
+	)/2
+	velocities[(size - 1)* size] = (
+		velocities[(size - 2)*size] +
+		velocities[(size - 1)*size + 1]
+	)/2
+	velocities[(size - 1)*size + size - 1] = (
+		velocities[(size - 2)*size + size - 1] +
+		velocities[(size - 1)*size + size - 2
+	])/2
 	
+

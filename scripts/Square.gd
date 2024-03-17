@@ -64,6 +64,7 @@ func _process(delta):
 	grid.diffuse(delta)
 	grid.diffuse_v(delta)
 	grid.clear_divergence()
+	grid.vorticity_confinment(delta)
 	grid.advect(delta)
 	grid.advect_v(delta)
 

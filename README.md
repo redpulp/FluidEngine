@@ -107,3 +107,28 @@ $$\nabla p(x,y) = \left(\frac{p(x+1,y)-p(x-1,y)}{2} , \frac{p(x,y+1)-p(x,y-1)}{2
 We know that the curl of the gradient of a scal field is equal to the zero vector. There is our guy!
 
 We can now subtract this value to every cell of the grid to remove the divergence, this has the side effect of adding curl, which we don't mind (swirls are pretty).
+
+### Vorticity confinment
+
+To create a more realistic effect of secondary swirls it's useful to manually accelerate the velocity in zones with existing curl, due to the failure of numerical discretisation methods to introduce small-scal features of the flow.
+
+The operation is pretty simple, for every cell we get the curl:
+
+$$c(x,y) = v_x(x+1, y)-v_x(x-1, y)+v_y(x, y+1)-v_y(x, y-1)$$
+
+We normalize it by its length and find the 2 components:
+
+$$
+\begin{aligned}
+& \omega = \text{vorticity} \\
+& dx = |c(x, y-1)| - |c(x,y+1)| \\
+& dy = |c(x+1, y)| - |c(x-1,y)| \\
+& L = \sqrt{dx^2 + dy^2} + 1e^{-5}\\
+& vx = \frac{\omega}{L*dx} \\
+& vy = \frac{\omega}{L*dy}
+\end{aligned}
+$$
+
+We then add this factor to every cell's velocity, multiplied by its curl
+
+$$ vx\cdot\delta \cdot c(x,y), \ \ \ vy\cdot\delta\cdot c(x,y) $$
