@@ -1,8 +1,9 @@
 extends Node2D
 
 const squareSize: float = 10.0
-const gridSquares: int = 50
+const gridSquares: int = 70
 const gridPixelSize = squareSize * gridSquares
+
 
 const FluidGrid = preload("utils/FluidGrid.gd")
 var grid : FluidGrid
@@ -22,6 +23,7 @@ var currentVelocity: Vector2
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	grid = FluidGrid.new(gridSquares)
+	DisplayServer.window_set_size(Vector2i(gridPixelSize, gridPixelSize))
 	self.position = get_viewport_rect().size/2
 
 func _draw():
@@ -30,7 +32,7 @@ func _draw():
 		for j in range(gridSquares):
 			draw_rect(
 				Rect2(-gridPixelSize/2 + (squareSize * j), -gridPixelSize/2 + (squareSize * i), squareSize, squareSize),
-				Color(1, 1, 1, grid.densities[j][i])
+				Color(1, 1, 1, grid.densities[(j * gridSquares) + i])
 			)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

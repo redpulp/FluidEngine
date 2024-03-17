@@ -8,38 +8,32 @@ var divergence: Array = []
 var p: Array = []
 
 var size: int
+var length: int
 const DENSITY = 50.
 const DIFFUSION_RATE = .03
 
 # Iterations of Gauss-Seidel method
-const diffuse_density_iterations = 10
-const diffuse_velocity_iterations = 10
+const diffuse_density_iterations = 5
+const diffuse_velocity_iterations = 20
 const divergence_iterations = 10
 
 #Dynamic Detail allocation
 
 func _init(grid_size: int):
 	size = grid_size
-	densities = []
-	for i in range(grid_size): 
-		densities.append([])
-		velocities.append([])
-		divergence.append([])
-		p.append([])
-		for j in range(grid_size):
-			densities[i].append(0.)
-			velocities[i].append(Vector2(0, 0))
-			divergence[i].append(0.)
-			p[i].append(0.)
+	length = size * size
+	for i in range(length): 
+		densities.append(0.)
+		velocities.append(Vector2(0, 0))
+		divergence.append(0.)
+		p.append(0.)
 			
-func getEl(array: Array, i: int, j: int):
-	return array[(i * size) + j]
 	
 func add_density(i: int, j: int, delta: float):
-	densities[i][j] += max(delta * DENSITY, 1.)
+	densities[(i * size) + j] += max(delta * DENSITY, 1.)
 	
 func add_velocity(i: int, j: int, delta: float, vector: Vector2):
-	velocities[i][j] += delta * vector
+	velocities[(i * size) + j] += delta * vector
 	
 func lerp(a,b,k):
 	return a + k*(b-a)
@@ -50,8 +44,14 @@ func diffuse(delta: float):
 	for k in range(diffuse_density_iterations):
 		for i in range(1, size - 1):
 			for j in range(1, size - 1):
-				var initial_density = densities[i][j]
-				densities[i][j] = (initial_density + a*(densities[i-1][j] + densities[i+1][j] + densities[i][j-1] + densities[i][j+1]))/(1+4*a)
+				var initial_density = densities[(i * size) + j]
+				densities[(i * size) + j] = (
+					initial_density + a*(
+						densities[((i - 1) * size) + j] +
+						densities[((i + 1) * size) + j] +
+						densities[(i * size) + j - 1] +
+						densities[(i * size) + j + 1])
+					)/(1+4*a)
 		
 		set_bounds()
 	
@@ -61,8 +61,14 @@ func diffuse_v(delta: float):
 	for k in range(diffuse_velocity_iterations):
 		for i in range(1, size - 1):
 			for j in range(1, size - 1):
-				var initial_density = velocities[i][j]
-				velocities[i][j] = (initial_density + a*(velocities[i-1][j] + velocities[i+1][j] + velocities[i][j-1] + velocities[i][j+1]))/(1+4*a)
+				var initial_velocity = velocities[(i * size) + j]
+				velocities[(i * size) + j] = (
+					initial_velocity + a*(
+						velocities[((i - 1) * size) + j] +
+						velocities[((i + 1) * size) + j] +
+						velocities[(i * size) + j - 1] +
+						velocities[(i * size) + j + 1])
+					)/(1+4*a)
 				
 		set_bounds_v()
 		
@@ -77,26 +83,42 @@ func bound_index(value: float):
 func advect(delta: float):
 	for i in range(1, size - 1):
 		for j in range(1, size - 1):
-			var f = Vector2(i, j) - velocities[i][j]*delta
+			var f = Vector2(i, j) - velocities[(i * size) + j]*delta
 			var bound = Vector2(bound_index(f.x), bound_index(f.y))
 			var floored = floor(bound)
 			var frac = bound - floored
-			var z1 = lerp(densities[floored.x][floored.y], densities[floored.x + 1][floored.y], frac.x)
-			var z2 = lerp(densities[floored.x][floored.y + 1], densities[floored.x + 1][floored.y + 1], frac.x)
-			densities[i][j] = lerp(z1, z2, frac.y)
+			var z1 = lerp(
+				densities[(floored.x * size) + floored.y],
+				densities[((floored.x + 1) * size) + floored.y],
+				frac.x
+			)
+			var z2 = lerp(
+				densities[(floored.x * size) + floored.y + 1],
+				densities[((floored.x + 1) * size) + floored.y + 1],
+				frac.x
+			)
+			densities[(i * size) + j] = lerp(z1, z2, frac.y)
 			
 	set_bounds()
 			
 func advect_v(delta: float):
 	for i in range(1, size - 1):
 		for j in range(1, size - 1):
-			var f = Vector2(i, j) - velocities[i][j]*delta
+			var f = Vector2(i, j) - velocities[(i * size) + j]*delta
 			var bound = Vector2(bound_index(f.x), bound_index(f.y))
 			var floored = floor(bound)
 			var frac = bound - floored
-			var z1 = lerp(velocities[floored.x][floored.y], velocities[floored.x + 1][floored.y], frac.x)
-			var z2 = lerp(velocities[floored.x][floored.y + 1], velocities[floored.x + 1][floored.y + 1], frac.x)
-			velocities[i][j] = lerp(z1, z2, frac.y)
+			var z1 = lerp(
+				velocities[(floored.x * size) + floored.y],
+				velocities[((floored.x + 1) * size) + floored.y],
+				frac.x
+			)
+			var z2 = lerp(
+				velocities[(floored.x * size) + floored.y + 1],
+				velocities[((floored.x + 1) * size) + floored.y + 1],
+				frac.x
+			)
+			velocities[(i * size) + j] = lerp(z1, z2, frac.y)
 			
 	set_bounds_v()
 
@@ -140,17 +162,28 @@ func get_line(i1, j1, i2, j2):
 func clear_divergence():
 	for i in range(1, size - 1):
 		for j in range(1, size - 1):
-			p[i][j] = 0.
-			divergence[i][j] = -(velocities[i+1][j].x - velocities[i-1][j].x + velocities[i][j+1].y - velocities[i][j-1].y)/(2 * size)
+			p[(i * size) + j] = 0.
+			divergence[(i * size) + j] = -(
+				velocities[((i+1) * size) + j].x -
+				velocities[(i-1) * size  + j].x +
+				velocities[(i * size) + j+1].y -
+				velocities[i*size + j-1].y
+			)/(2 * size)
 	for z in range(divergence_iterations):
 		for i in range(1, size - 1):
 			for j in range(1, size - 1):
-				p[i][j] = (divergence[i][j] + p[i-1][j] + p[i+1][j] + p[i][j-1] + p[i][j+1])/4;
+				p[(i * size) + j] = (
+					divergence[(i * size) + j] +
+					p[(i-1) * size  + j] +
+					p[(i+1)*size + j] +
+					p[i*size + j-1] +
+					p[(i * size) + j+1]
+				)/4;
 	for i in range(1, size - 1):
 		for j in range(1, size - 1):
-			velocities[i][j] -= Vector2(
-				(p[i+1][j] - p[i-1][j])*(size/2),
-				(p[i][j+1] - p[i][j-1])*(size/2)	
+			velocities[(i * size) + j] -= Vector2(
+				(p[(i+1)*size + j] - p[(i-1) * size  + j])*(size/2),
+				(p[(i * size) + j+1] - p[i*size + j-1])*(size/2)	
 			)
 	
 	set_bounds_v()
@@ -159,26 +192,44 @@ func clear_divergence():
 func set_bounds():
 	
 	for i in range(1, size - 1):
-		densities[0][i] = densities[1][i]
-		densities[size - 1][i] = densities[size - 2][i]
-		densities[i][0] = densities[i][1]
-		densities[i][size - 1] = densities[i][size - 2]
+		densities[i] = densities[size + i]
+		densities[(size - 1)*size + i] = densities[(size - 2)*size + i]
+		densities[i*size] = densities[i*size + 1]
+		densities[i*size + size - 1] = densities[i*size + size - 2]
 		
-	densities[0][0] = (densities[1][0] + densities[0][1])/2
-	densities[0][size - 1] = (densities[1][size - 1] + densities[0][size - 2])/2
-	densities[size - 1][0] = (densities[size - 2][0] + densities[size - 1][1])/2
-	densities[size - 1][size - 1] = (densities[size - 2][size - 1] + densities[size - 1][size - 2])/2
+	densities[0] = (densities[size] + densities[1])/2
+	densities[size - 1] = (densities[size + size - 1] + densities[size - 2])/2
+	densities[(size - 1)* size] = (
+		densities[(size - 2)*size] +
+		densities[(size - 1)*size + 1]
+	)/2
+	densities[(size - 1)*size + size - 1] = (
+		densities[(size - 2)*size + size - 1] + 
+		densities[(size - 1)*size + size - 2]
+	)/2
 
 func set_bounds_v():
 	
 	for i in range(1, size - 1):
-		velocities[0][i] = Vector2(-velocities[1][i].x, velocities[1][i].y)
-		velocities[size - 1][i] = Vector2(-velocities[size - 2][i].x, -velocities[size - 2][i].y)
-		velocities[i][0] = Vector2(velocities[i][1].x, -velocities[i][1].y)
-		velocities[i][size - 1] = Vector2(velocities[i][size - 2].x, -velocities[i][size - 2].y)
+		velocities[i] = Vector2(
+			-velocities[size+ i].x,
+			velocities[size + i].y
+		)
+		velocities[(size - 1)*size + i] = Vector2(
+			-velocities[(size - 2)*size + i].x,
+			-velocities[(size - 2)*size + i].y
+		)
+		velocities[i*size] = Vector2(
+			velocities[i*size + 1].x,
+			-velocities[i*size + 1].y
+		)
+		velocities[i*size + size - 1] = Vector2(
+			velocities[i*size + size - 2].x,
+			-velocities[i*size + size - 2].y
+		)
 		
-	velocities[0][0] = (velocities[1][0] + velocities[0][1])/2
-	velocities[0][size - 1] = (velocities[1][size - 1] + velocities[0][size - 2])/2
-	velocities[size - 1][0] = (velocities[size - 2][0] + velocities[size - 1][1])/2
-	velocities[size - 1][size - 1] = (velocities[size - 2][size - 1] + velocities[size - 1][size - 2])/2
+	velocities[0] = (velocities[size] + velocities[1])/2
+	velocities[size - 1] = (velocities[size + size - 1] + velocities[size - 2])/2
+	velocities[(size - 1)* size] = (velocities[(size - 2)*size] + velocities[(size - 1)*size + 1])/2
+	velocities[(size - 1)*size + size - 1] = (velocities[(size - 2)*size + size - 1] + velocities[(size - 1)*size + size - 2])/2
 	
