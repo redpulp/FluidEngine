@@ -21,8 +21,8 @@ Let's see how they can help us.
 
 $$
 \begin{aligned}
-& \nabla \cdot \bold{u} = 0 \\
-& \rho \frac{D\bold{u}}{Dt} = -\nabla p + \mu\nabla^2 \bold{u} + \rho\bold{F}
+& \nabla \cdot \mathbf{u} = 0 \\
+& \rho \frac{D\mathbf{u}}{Dt} = -\nabla p + \mu\nabla^2 \mathbf{u} + \rho\mathbf{F}
 \end{aligned}
 $$
 
