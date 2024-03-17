@@ -6,7 +6,7 @@ A small interactive fluid simulation, made with the [Godot Engine](https://godot
 
 You can create new fluid by holding the left mouse button, and move it around by holding the right mouse button and dragging it around
 
-![Creating and moving fluid](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjRndG1uaXIxNjducms3NTN6bGlybGRtemx2NThpY2pmOTMxdWpzbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4oQKdrIbijxkAgAZIQ/giphy.gif)
+![Creating and moving fluid](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWdtb2RobDc5aGtvc3htajlmOGtremphZXJtYzZmcm8yamE0MHhodSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2c25QYyu0aShPV4yy6/giphy.gif)
 
 ## Physics stuff
 
@@ -54,3 +54,5 @@ $$
 Please note that this can also be used to diffuse other properties, especially velocity.
 
 ### Advection
+
+WIP
