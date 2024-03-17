@@ -13,15 +13,27 @@ You can create new fluid by holding the left mouse button, and move it around by
 
 ## Physics stuff
 
-The project is based on [Real-Time Fluid Dynamics for Games](https://www.researchgate.net/publication/2560062_Real-Time_Fluid_Dynamics_for_Games) and [But How DO Fluid Simulations Work?](https://www.youtube.com/watch?v=qsYE1wMEMPA&t=4s), which use the Navier-Stokes equations to calculate the motion of the fluid.
+The project is based on [Real-Time Fluid Dynamics for Games](https://www.researchgate.net/publication/2560062_Real-Time_Fluid_Dynamics_for_Games) and [But How DO Fluid Simulations Work?](https://www.youtube.com/watch?v=qsYE1wMEMPA&t=4s).
 
-[EXPLAIN HOW THE NAVIER-STOKES EQUATION WORK]
+The Navier-Stokes equations have been a standard for fluid simulation since the implementation by Foster and Metaxas (1996).
 
-The fluid's density is represented as the opacity of squares on a grid, and its evolution only depends on density and velocity.
+Let's see how they can help us.
+
+$$
+\begin{aligned}
+& \nabla \cdot \bold{u} = 0 \\
+& \rho \frac{D\bold{u}}{Dt} = -\nabla p + \mu\nabla^2 \bold{u} + \rho\bold{F}
+\end{aligned}
+$$
+
+The first one is for mass conservation, that we can express a lack of divergence of the velocity vector field.
+The second equation express acceleration as dependent from 3 factors: internal forces (pressure and viscosity) and external forces. We will translate this concepts by calculating the evolution of the density of the fluid.
+
+The fluid's density is represented as the opacity of squares on a grid, and its evolution only depends another parameter: velocity.
 
 ### Diffusion
 
-Every cell of the fluid will gradually try to average its density with the neighboring cells, this phenomenon is called "diffusion". We can use the following parameters to determine the change of density in the cell $(x,y)$ cause by diffusion:
+Every cell of the fluid will gradually try to reach pressure equilibrium by moving its density to regions with lower density, this phenomenon is called "diffusion". We can use the following parameters to determine the exchange of density between a cell $(x,y)$ and its neighbors:
 
 [ILLUSTRATION OF PROGRESSING DIFFUSION]
 
@@ -72,4 +84,26 @@ The velocity vector of a cell doesn't usually point at the perfect center of ano
 
 ### Clearing Divergence
 
-...
+Divergence in our vector field would mean that fluid is appearing and disappearing from nothing, we have to get rid of it somehow.
+
+The fundamental theorem of vector calculus states that any sufficiently smooth, rapidly decaying vector field can be decomposed into the sum of a curl-free vector field and a divergence-free vector field. Let's find a curl-free vector field we can subtract from our own to get the desired divergence-free field.
+
+We first calculate the divergence at every cell as:
+
+$$ \nabla \cdot v(x,y) = \frac{v_x(x+1, y)-v_x(x-1, y)+v_y(x, y+1)-v_y(x, y-1)}{2} $$
+
+We can also extract the divergence as the result of a scalar field diffused from the neighboring cells
+
+$$[p(x-1,y)+p(x+1,y)+p(x,y-1)+p(x,y+1)] -4p(x,y) = \nabla\cdot v(x,y)$$
+
+Let's solve to find the divergence
+
+$$ p(x,y) = \frac{[p(x-1,y)+p(x+1,y)+p(x,y-1)+p(x,y+1)] - \nabla\cdot v}{4} $$
+
+We use the Gauss-Seidel Method to find the field. We can then find the gradient vector field:
+
+$$\nabla p(x,y) = \left(\frac{p(x+1,y)-p(x-1,y)}{2} , \frac{p(x,y+1)-p(x,y-1)}{2}\right)$$
+
+We know that the curl of the gradient of a scal field is equal to the zero vector. There is our guy!
+
+We can now subtract this value to every cell of the grid to remove the divergence, this has the side effect of adding curl, which we don't mind (swirls are pretty).
