@@ -2,10 +2,10 @@ extends Node
 
 class_name FluidGrid
 
-var densities: Array = []
-var velocities: Array = []
-var divergence: Array = []
-var p: Array = []
+var densities : PackedFloat32Array
+var velocities: PackedVector2Array
+var divergence: PackedFloat32Array
+var p: PackedFloat32Array
 
 var size: int
 var length: int
@@ -14,21 +14,24 @@ const DIFFUSION_RATE = .03
 
 # Iterations of Gauss-Seidel method
 const diffuse_density_iterations = 5
-const diffuse_velocity_iterations = 20
+const diffuse_velocity_iterations = 12
 const divergence_iterations = 10
-
-#Dynamic Detail allocation
 
 func _init(grid_size: int):
 	size = grid_size
 	length = size * size
-	for i in range(length): 
-		densities.append(0.)
-		velocities.append(Vector2(0, 0))
-		divergence.append(0.)
-		p.append(0.)
-			
 	
+	densities.resize(length)
+	velocities.resize(length)
+	divergence.resize(length)
+	p.resize(length)
+	
+	for i in range(length): 
+		densities[i] = 0.
+		velocities[i] = Vector2(0, 0)
+		divergence[i] = 0.
+		p[i] = 0.
+
 func add_density(i: int, j: int, delta: float):
 	densities[(i * size) + j] += max(delta * DENSITY, 1.)
 	
