@@ -18,6 +18,8 @@ const nullSquare = {
 var previousSquare = nullSquare.duplicate()
 var currentSquare = nullSquare.duplicate()
 
+var previousPos = Vector2(0., 0.)
+var currentPos = Vector2(0., 0.)
 var currentVelocity: Vector2
 
 # Called when the node enters the scene tree for the first time.
@@ -70,6 +72,7 @@ func _input(event):
 		if not event.pressed:
 			previousSquare = nullSquare.duplicate()
 			currentSquare = nullSquare.duplicate()
+			currentVelocity = Vector2(0., 0.)
 		match event.button_index:
 			MOUSE_BUTTON_LEFT:
 				isLeftClicking = event.pressed
@@ -77,6 +80,9 @@ func _input(event):
 				isRightClicking = event.pressed
 				
 	previousSquare = currentSquare.duplicate()
+	
+	previousPos = currentPos
+	currentPos = get_global_mouse_position()
 				
 	if (event is InputEventMouseMotion or event is InputEventMouseButton) and (isLeftClicking or isRightClicking):
 		var gridMousePosition = event.position - get_viewport_rect().size/2 + Vector2(gridPixelSize/2, gridPixelSize/2)
@@ -88,4 +94,4 @@ func _input(event):
 			currentSquare.j = floor((gridMousePosition.y / gridPixelSize) * gridSquares)
 			
 	if (event is InputEventMouseMotion) and isRightClicking:
-		currentVelocity = event.velocity
+		currentVelocity = (currentPos - previousPos) * 5
