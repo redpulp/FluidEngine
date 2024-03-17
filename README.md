@@ -1,3 +1,6 @@
+> **Note**  
+> This README is still a work in progress, you will find a bit of a mess
+
 # FluidEngine
 
 A small interactive fluid simulation, made with the [Godot Engine](https://godotengine.org/).
@@ -10,13 +13,17 @@ You can create new fluid by holding the left mouse button, and move it around by
 
 ## Physics stuff
 
-The project is based on [Real-Time Fluid Dynamics for Games](https://www.researchgate.net/publication/2560062_Real-Time_Fluid_Dynamics_for_Games), which uses the Navier-Stokes equations to calculate the motion of the fluid.
+The project is based on [Real-Time Fluid Dynamics for Games](https://www.researchgate.net/publication/2560062_Real-Time_Fluid_Dynamics_for_Games) and [But How DO Fluid Simulations Work?](https://www.youtube.com/watch?v=qsYE1wMEMPA&t=4s), which use the Navier-Stokes equations to calculate the motion of the fluid.
+
+[EXPLAIN HOW THE NAVIER-STOKES EQUATION WORK]
 
 The fluid's density is represented as the opacity of squares on a grid, and its evolution only depends on density and velocity.
 
 ### Diffusion
 
-The fluid will gradually diffuse by approaching the average density value of the neighbouring cells. We can use the following parameters to determine the change of density in the cell $(x,y)$.
+Every cell of the fluid will gradually try to average its density with the neighboring cells, this phenomenon is called "diffusion". We can use the following parameters to determine the change of density in the cell $(x,y)$ cause by diffusion:
+
+[ILLUSTRATION OF PROGRESSING DIFFUSION]
 
 $$
 \begin{aligned}
@@ -34,6 +41,8 @@ $$d_0 = d_1 - k(s - d_1)$$
 
 This makes the solution of $d_1$ hyperbolic in relation with k, which helps avoid overshooting the $s$ target value.
 $$d_1 = \frac{d_0 + ks}{1+k}$$
+
+[ILLUSTRATION OF HYPERBOLIC RELATION]
 
 If we try to substitute the value of $s$ in the formula above, we see that it becomes a system of equations. We can solve this with the Gauss-Seidel Method, which is applicable because of the stricly diagonally dominant matrix of the resulting equation system.
 
@@ -55,4 +64,12 @@ Please note that this can also be used to diffuse other properties, especially v
 
 ### Advection
 
-WIP
+Advection is how cells transfer properties to other cells according to their velocity. This applies to both the velocity and density of our cells.
+
+The velocity vector of a cell doesn't usually point at the perfect center of another cell, so we interpolate the value between the 4 closest cells by their distance. This works fine, but we can make it a bit cheaper: instead of extracting the sum of all the velocity vectors pointing close to a cell, we can instead invert the vector and subtract velocity to the adjacent cells, this will only take one calculation per cell.
+
+[ILLUSTRATION OF CELLS AND VECTORS]
+
+### Clearing Divergence
+
+...
