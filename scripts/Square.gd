@@ -1,8 +1,9 @@
 extends Node2D
 
 const squareSize: float = 10.0
-const gridSquares: int = 50
+const gridSquares: int = 70
 const gridPixelSize = squareSize * gridSquares
+
 
 const FluidGrid = preload("utils/FluidGrid.gd")
 var grid : FluidGrid
@@ -17,11 +18,14 @@ const nullSquare = {
 var previousSquare = nullSquare.duplicate()
 var currentSquare = nullSquare.duplicate()
 
+var previousPos = Vector2(0., 0.)
+var currentPos = Vector2(0., 0.)
 var currentVelocity: Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	grid = FluidGrid.new(gridSquares)
+	DisplayServer.window_set_size(Vector2i(gridPixelSize, gridPixelSize))
 	self.position = get_viewport_rect().size/2
 
 func _draw():
@@ -30,7 +34,7 @@ func _draw():
 		for j in range(gridSquares):
 			draw_rect(
 				Rect2(-gridPixelSize/2 + (squareSize * j), -gridPixelSize/2 + (squareSize * i), squareSize, squareSize),
-				Color(1, 1, 1, grid.densities[j][i])
+				Color(1, 1, 1, grid.densities[(j * gridSquares) + i])
 			)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -68,6 +72,7 @@ func _input(event):
 		if not event.pressed:
 			previousSquare = nullSquare.duplicate()
 			currentSquare = nullSquare.duplicate()
+			currentVelocity = Vector2(0., 0.)
 		match event.button_index:
 			MOUSE_BUTTON_LEFT:
 				isLeftClicking = event.pressed
@@ -75,6 +80,9 @@ func _input(event):
 				isRightClicking = event.pressed
 				
 	previousSquare = currentSquare.duplicate()
+	
+	previousPos = currentPos
+	currentPos = get_global_mouse_position()
 				
 	if (event is InputEventMouseMotion or event is InputEventMouseButton) and (isLeftClicking or isRightClicking):
 		var gridMousePosition = event.position - get_viewport_rect().size/2 + Vector2(gridPixelSize/2, gridPixelSize/2)
@@ -86,4 +94,4 @@ func _input(event):
 			currentSquare.j = floor((gridMousePosition.y / gridPixelSize) * gridSquares)
 			
 	if (event is InputEventMouseMotion) and isRightClicking:
-		currentVelocity = event.velocity
+		currentVelocity = (currentPos - previousPos) * 5
