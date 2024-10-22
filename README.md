@@ -62,7 +62,7 @@ We can finally get the following operation, calculated multiple times to approac
 
 $$
 \begin{aligned}
-& \delta = \text{time elapsed from last frame}\\
+& \delta = \text{time elapsed from last frame} \\
 & a = k\delta  \\
 & d_1(x,y) = d_0(x,y) + a(\\
 & \ \ \ \ \ \ d_0(x-1,y) + d_0(x+1,y) + \\
@@ -102,7 +102,7 @@ $$ p(x,y) = \frac{[p(x-1,y)+p(x+1,y)+p(x,y-1)+p(x,y+1)] - \nabla\cdot v}{4} $$
 
 We use the Gauss-Seidel Method to find the field. We can then find the gradient vector field:
 
-$$\nabla p(x,y) = \left(\frac{p(x+1,y)-p(x-1,y)}{2} , \frac{p(x,y+1)-p(x,y-1)}{2}\right)$$
+$$\nabla p(x,y) = \left(\frac{p(x+1,y)-p(x-1,y)}{2} , \frac{p(x,y+1)-p(x,y-1)}{2}\right) $$
 
 We know that the curl of the gradient of a scal field is equal to the zero vector. There is our guy!
 
@@ -123,9 +123,9 @@ $$
 & \omega = \text{vorticity} \\
 & dx = |c(x, y-1)| - |c(x,y+1)| \\
 & dy = |c(x+1, y)| - |c(x-1,y)| \\
-& L = \sqrt{dx^2 + dy^2} + 1e^{-5}\\
-& vx = \frac{\omega}{L*dx} \\
-& vy = \frac{\omega}{L*dy}
+& L = \sqrt{(dx)^2 + (dy)^2} + 1 \times 10^{-5} \\
+& vx = \frac{\omega}{L \cdot dx} \\
+& vy = \frac{\omega}{L \cdot dy}
 \end{aligned}
 $$
 
